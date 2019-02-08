@@ -1,28 +1,102 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
 
 class App extends Component {
+  state = {
+    todoList: []
+  };
+
+  handleAddTodo = todo => {
+    this.setState(prevState => {
+      return {
+        todoList: [...prevState.todoList, todo]
+      };
+    });
+  };
+
+  handleDeleteTodo = todoToDelete => {
+    this.setState(prevState => {
+      const updatedTodoList = prevState.todoList.filter(
+        (_, todo) => todo !== todoToDelete
+      );
+      return {
+        todoList: updatedTodoList
+      };
+    });
+  };
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <>
+        <TodoForm addTodo={this.handleAddTodo} />
+        {this.state.todoList.length !== 0 && (
+          <>
+            <h2>Todo List</h2>
+            <ul>
+              {this.state.todoList.map((todo, index) => (
+                <Todo
+                  todo={todo}
+                  index={index}
+                  key={Math.random()}
+                  deleteTodo={this.handleDeleteTodo}
+                />
+              ))}
+            </ul>
+          </>
+        )}
+      </>
     );
   }
 }
+
+/*
+|--------------------------------------------------------------------------
+| TODO FORM
+|--------------------------------------------------------------------------
+*/
+
+class TodoForm extends Component {
+  state = {
+    inputValue: ''
+  };
+
+  handleInputChange = e => {
+    this.setState({
+      inputValue: e.target.value
+    });
+  };
+
+  handleFormSubmit = e => {
+    e.preventDefault();
+
+    if (!this.state.inputValue) return alert('write something !');
+    this.props.addTodo(this.state.inputValue);
+    this.setState({
+      inputValue: ''
+    });
+  };
+
+  render() {
+    return (
+      <form onSubmit={this.handleFormSubmit}>
+        <input
+          type="text"
+          onChange={this.handleInputChange}
+          value={this.state.inputValue}
+        />
+        <input type="submit" value="Add Todo" />
+      </form>
+    );
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| TODO
+|--------------------------------------------------------------------------
+*/
+
+const Todo = ({ todo, index, deleteTodo }) => (
+  <li onClick={() => deleteTodo(index)}>{todo}</li>
+);
 
 export default App;
